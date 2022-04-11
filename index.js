@@ -3,9 +3,38 @@ const morgan = require("morgan");
 const contentful = require("contentful");
 const app = express();
 const port = 8000;
+const cors = require('cors');
+
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.sendFile("index.html", { root: __dirname });
+});
+
+app.get("/articles", (req, res) => {
+  // Display all article
+  const articles = client
+    .getEntries({
+      content_type: "article",
+    })
+    .then((entries) => {
+      const articlesContent = [];
+      entries.items.forEach(function (entry) {
+        const path = entry.fields;
+        const idArticle = path.idArticle;
+        const titleArticle = path.titleArticle;
+        const textArticle = path.textArticle;
+        const photoArticle = path.photoArticle.fields.title;
+        articlesContent.push({
+          idArticle,
+          titleArticle,
+          textArticle,
+          photoArticle,
+        });
+        // console.log(articlesContent);
+      });
+      res.json(articlesContent);
+    });
 });
 
 // Display listen port
@@ -47,64 +76,51 @@ const client = contentful.createClient({
   accessToken: "fXq2ggIWN3VvV4x_1aDbppHuvuUUX1A8ONqIkrgUosY",
 });
 
-// Display all article
-const articles = client
-  .getEntries({
-    content_type: "article",
-  })
-  .then((entries) => {
-    entries.items.forEach(function (entry) {
-      const path = entry.fields;
-      const idArticle = path.idArticle;
-      console.log(idArticle);
-      const titleProduct = path.titleArticle;
-      console.log(titleProduct)
-      const contentProduct = path.textArticle;
-      console.log(contentProduct)
-      const pictureProduct = path.photoArticle.fields.title;
-      console.log(pictureProduct)
-    });
-  });
-
 // Display all product
 const products = client
   .getEntries({
     content_type: "product",
   })
   .then((entries) => {
+    const productsContent = [];
     entries.items.forEach(function (entry) {
       const path = entry.fields;
       const idArticle = path.idProduct;
-      console.log(idArticle);
       const titleProduct = path.title;
-      console.log(titleProduct)
       const contentProduct = path.contentProduct;
-      console.log(contentProduct)
       const pictureProduct = path.photo.fields.title;
-      console.log(pictureProduct)
+      productsContent.push({
+        idArticle,
+        titleProduct,
+        contentProduct,
+        pictureProduct,
+      });
+      console.log(productsContent);
     });
   });
 
-
-// Display all article
+// Display all navigation
 const navigation = client
   .getEntries({
     content_type: "navigation",
   })
   .then((entries) => {
+    const navigationContent = [];
     entries.items.forEach(function (entry) {
       const path = entry.fields;
       const idNav = path.id;
-      console.log(idNav);
       const logoNav = path.logoWebsite.fields.title;
-      console.log(logoNav)
       const firstLink = path.firstLink;
-      console.log(firstLink)
       const secondLink = path.secondLink;
-      console.log(secondLink)
+      navigationContent.push({
+        idNav,
+        logoNav,
+        firstLink,
+        secondLink,
+      });
+      console.log(navigationContent);
     });
   });
-
 
 // Display one content
 // const navigation = client.getEntry("4rQ93fbB7lv9jA1IAOshiL").then((entry) => {
@@ -113,7 +129,6 @@ const navigation = client
 //   const firstLink = entry.fields.firstLink;
 //   const secondLink = entry.fields.secondLink;
 // });
-
 
 // // Display all content
 // client.getEntries().then((entries) => {
