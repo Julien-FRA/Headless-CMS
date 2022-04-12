@@ -1,4 +1,25 @@
-const root = document.querySelector("#root");
+const containerArticles = document.querySelector("#container-articles");
+const containerProducts = document.querySelector("#container-products");
+const containerNavigation = document.querySelector("#container-navigation");
+
+fetch("http://localhost:8000/navigation")
+  .then((response) => response.json())
+  .then((data) => {
+    data.forEach((navigation) => {
+      const navigationItem =
+        `<ul><li>` +
+        navigation.idNav +
+        `</li><li>` +
+        navigation.logoNav +
+        `</li><li>` +
+        navigation.firstLink +
+        `</li><li>` +
+        navigation.secondLink +
+        `</li></ul>`;
+      containerNavigation.insertAdjacentHTML("beforeend", navigationItem);
+    });
+  })
+  .catch((err) => console.log(err));
 
 fetch("http://localhost:8000/articles")
   .then((response) => response.json())
@@ -14,7 +35,26 @@ fetch("http://localhost:8000/articles")
         `</p><div>` +
         article.photoArticle +
         `</div></div>`;
-      root.insertAdjacentHTML("beforeend", articleItem);
+      containerArticles.insertAdjacentHTML("beforeend", articleItem);
+    });
+  })
+  .catch((err) => console.log(err));
+
+fetch("http://localhost:8000/products")
+  .then((response) => response.json())
+  .then((data) => {
+    data.forEach((product) => {
+      const productItem =
+        `<div><p>` +
+        product.idProduct +
+        `</p><h2>` +
+        product.titleProduct +
+        `</h2><p>` +
+        product.contentProduct +
+        `</p><div>` +
+        product.pictureProduct +
+        `</div></div>`;
+      containerProducts.insertAdjacentHTML("beforeend", productItem);
     });
   })
   .catch((err) => console.log(err));

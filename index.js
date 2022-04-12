@@ -3,12 +3,44 @@ const morgan = require("morgan");
 const contentful = require("contentful");
 const app = express();
 const port = 8000;
-const cors = require('cors');
+const cors = require("cors");
 
 app.use(cors());
 
 app.get("/", (req, res) => {
   res.sendFile("index.html", { root: __dirname });
+});
+
+// Connexion with space and access token >> Settings >> API Keys >> Space ID and Content Delivery API - access token
+const client = contentful.createClient({
+  space: "kl209jquns0j",
+  accessToken: "fXq2ggIWN3VvV4x_1aDbppHuvuUUX1A8ONqIkrgUosY",
+});
+
+app.get("/navigation", (req, res) => {
+  // Display all navigation
+  const navigation = client
+    .getEntries({
+      content_type: "navigation",
+    })
+    .then((entries) => {
+      const navigationContent = [];
+      entries.items.forEach(function (entry) {
+        const path = entry.fields;
+        const idNav = path.id;
+        const logoNav = path.logoWebsite.fields.title;
+        const firstLink = path.firstLink;
+        const secondLink = path.secondLink;
+        navigationContent.push({
+          idNav,
+          logoNav,
+          firstLink,
+          secondLink,
+        });
+        // console.log(navigationContent);
+      });
+      res.json(navigationContent);
+    });
 });
 
 app.get("/articles", (req, res) => {
@@ -34,6 +66,32 @@ app.get("/articles", (req, res) => {
         // console.log(articlesContent);
       });
       res.json(articlesContent);
+    });
+});
+
+app.get("/products", (req, res) => {
+  // Display all product
+  const products = client
+    .getEntries({
+      content_type: "product",
+    })
+    .then((entries) => {
+      const productsContent = [];
+      entries.items.forEach(function (entry) {
+        const path = entry.fields;
+        const idProduct = path.idProduct;
+        const titleProduct = path.title;
+        const contentProduct = path.contentProduct;
+        const pictureProduct = path.photo.fields.title;
+        productsContent.push({
+          idProduct,
+          titleProduct,
+          contentProduct,
+          pictureProduct,
+        });
+        // console.log(productsContent);
+      });
+      res.json(productsContent);
     });
 });
 
@@ -69,58 +127,6 @@ app.use(function (err, req, res, next) {
     error: {},
   });
 });
-
-// Connexion with space and access token >> Settings >> API Keys >> Space ID and Content Delivery API - access token
-const client = contentful.createClient({
-  space: "kl209jquns0j",
-  accessToken: "fXq2ggIWN3VvV4x_1aDbppHuvuUUX1A8ONqIkrgUosY",
-});
-
-// Display all product
-const products = client
-  .getEntries({
-    content_type: "product",
-  })
-  .then((entries) => {
-    const productsContent = [];
-    entries.items.forEach(function (entry) {
-      const path = entry.fields;
-      const idArticle = path.idProduct;
-      const titleProduct = path.title;
-      const contentProduct = path.contentProduct;
-      const pictureProduct = path.photo.fields.title;
-      productsContent.push({
-        idArticle,
-        titleProduct,
-        contentProduct,
-        pictureProduct,
-      });
-      console.log(productsContent);
-    });
-  });
-
-// Display all navigation
-const navigation = client
-  .getEntries({
-    content_type: "navigation",
-  })
-  .then((entries) => {
-    const navigationContent = [];
-    entries.items.forEach(function (entry) {
-      const path = entry.fields;
-      const idNav = path.id;
-      const logoNav = path.logoWebsite.fields.title;
-      const firstLink = path.firstLink;
-      const secondLink = path.secondLink;
-      navigationContent.push({
-        idNav,
-        logoNav,
-        firstLink,
-        secondLink,
-      });
-      console.log(navigationContent);
-    });
-  });
 
 // Display one content
 // const navigation = client.getEntry("4rQ93fbB7lv9jA1IAOshiL").then((entry) => {
